@@ -16,6 +16,10 @@ sample_data = [
     ("Viet was crazy dude".split(), ["NNP", "V","JJ","NN"])
 ]
 
+
+#print(sample_data[0][0])
+
+
 word_to_ix = {}
 for sent, pos in sample_data:
     for word in sent:
@@ -70,9 +74,12 @@ loss = nn.NLLLoss()
 opt = torch.optim.SGD(model.parameters(), lr= 0.1)
 
 with torch.no_grad():
-    inputs = prepare_data(sample_data[0][0], word_to_ix)
-    tag_scores = model(inputs)
-    print(tag_scores)
+    for touple_ in sample_data:
+        for index, key in enumerate(touple_):
+            if index % 2 == 0:
+                inputs = prepare_data(key, word_to_ix)
+                tag_scores = model(inputs)
+                print(tag_scores)
 
 for epoch in range(300):
     for sentence, tags in sample_data:
@@ -98,6 +105,12 @@ for epoch in range(300):
 # see what the scores are after training
 
 with torch.no_grad():
-    inputs = prepare_data(sample_data[0][0], word_to_ix)
-    tag_scores = model(inputs)
-    print(tag_scores)
+    for touple_ in sample_data:
+        for index, key in enumerate(touple_):
+            if index % 2 == 0:
+                inputs = prepare_data(key, word_to_ix)
+                tag_scores = model(inputs)
+                print(tag_scores)
+
+
+
