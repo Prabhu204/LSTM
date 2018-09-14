@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 def prepare_data(seq, idx):
     index_id = [idx[w] for w in seq]
     return torch.tensor(index_id, dtype = torch.long)
