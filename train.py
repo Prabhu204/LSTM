@@ -45,8 +45,8 @@ def get_args():
 
 def train(opt):
 
-    param_file = open(opt.save_result + os.sep + opt.file_name, "w")
-    param_file.write("Selected model parameters: {}".format(vars(opt)))
+    with open(opt.save_result + os.sep + opt.file_name, "w") as file:
+        file.write("Selected model parameters: {}".format(vars(opt)))
 
     train_dataset = Dataset_(opt.dataset + os.sep + "train.csv", opt.dataset + os.sep + "classes.txt",
                             opt.max_length)
@@ -77,13 +77,13 @@ def train(opt):
         print('epoch {}'.format(epoch + 1))
         print('*' * 10)
         for step, batch in enumerate(train_loader):  # gives batch_size
-            #b_x = b_x.view(-1, 28, 28)  # reshpe x to (batch_size, step_size, input_size)
             # Forward propagation
             if opt.gpu:
                 batch = [Variable(record).cuda() for record in batch]
             else:
                 batch = [Variable(record) for record in batch]
             b_x, b_y = batch
+            # b_x is reshped to (batch_size, step_size, input_size)
             out = model(b_x)
             loss = criterion(out, b_y)
             optimizer.zero_grad()
@@ -96,7 +96,6 @@ def train(opt):
         # validate model
         model.eval()
         with torch.no_grad():
-            correct = 0
             test_loss = 0
             predictions= []
             target_list= []
@@ -108,9 +107,18 @@ def train(opt):
                 predictions.extend(pred)
                 target_list.extend(labels)
             print('Test Accuracy of the model on test data: {}'.format(metrics.accuracy_score(target_list,predictions)))
-            print('Con_mat: {}\n'.format(metrics.confusion_matrix(target_list, predictions)))
+            print('Con_mat: {} \n'.format(metrics.confusion_matrix(target_list, predictions)))
+
+            with open(opt.save_result + os.sep + opt.file_name, 'a') as f:
+                f.write('\n Accuracy of the model on dev_data: {}   Epoch: {}'.format(metrics.accuracy_score(target_list, predictions),
+                                                                                 epoch +1 ))
+                f.write('\n Con_mat: {} \n'.format(metrics.confusion_matrix(target_list, predictions)))
+
         torch.save(model.state_dict(), opt.save_model+os.sep+opt.model_name)
 
 if __name__ == '__main__':
     opt = get_args()
     train(opt)
+
+
+
