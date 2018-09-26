@@ -4,3 +4,6 @@ src/toy_example.py
 src/dataset_process.py
 src/Basic_rnn.py
 model.ckpt
+one_hot_en.py
+example.py
+.idea/
