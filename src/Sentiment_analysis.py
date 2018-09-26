@@ -5,36 +5,32 @@ author: Prabhu
 import torch
 import torch.nn as nn
 from  torch.autograd import Variable
+import numpy as np
 
-# Devise configeration
+class LSTMChar(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes, num_layers, vocab = None,embedding_dim = None):
+        super(LSTMChar, self).__init__()
+        self.input_size= input_size       # input size
+        self.hidden_size = hidden_size    # hidden dimension
+        self.num_classes = num_classes
+        self.num_layers = num_layers
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-class LSTMchar(nn.Module):
-    def __int__(self, embedding_dim, hidden_dim, vocab_size,output, n_layers):
-        super(LSTMchar, self).__init__()
-        self.embedding_dim = embedding_dim
-        self.hidden_dim = hidden_dim
-        self.vocab_size = vocab_size
-        self.n_layers = n_layers
-        self.output = output
+        self.encoder = nn.Embedding(vocab, embedding_dim)
 
-        self.encoder = nn.Embedding(vocab_size,embedding_dim) # embeddings
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, n_layers)
-        self.h_layer2out = nn.Linear(hidden_dim, output)
+        self.lstm = nn.LSTM(input_size,hidden_size, batch_first= True)
 
-    def forward(self, input, hidden):
-        batch_size = input.size(0)
-        # def forward(self, x,h) where x = input, h = hidden
-        self.encoded = self.encoder(input.view(1,-1))   # embed word ids to vectors
-                                                        # x = self.encoder(x)
-        output, hidden = self.lstm(self.encoded.view(1,batch_size,-1), hidden) # forward propagate LSTM
-                                                                        # out, (h,c) = self.lstm(x, h)
-        # reshape output to (batch_size*sequence_length, hidden_dim)
-        output = self.h_layer2out(output.view(batch_size, -1))
+        #self.h2h = nn.Linear(n_hidden, n_hidden)
+        self.h2o = nn.Linear(hidden_size, num_classes)
+        #self.output = nn.LogSoftmax()
+        #self.dropout = nn.Dropout(p = 0.2)
 
-        return output, hidden
 
-    def init_hidden(self, batch_size):
-        return (Variable(torch.zeros(self.n_layers, batch_size, self.hidden_dim)),
-                Variable(torch.zeros(self.n_layers,batch_size,self.hidden_dim)))
+    def forward(self, x):
+        # Set initial states
+        h0 = Variable(torch.zeros(self.num_layers, x.size(0), self.hidden_size))
+        c0 = Variable(torch.zeros(self.num_layers, x.size(0), self.hidden_size))
+        out,_ = self.lstm(x, (h0,c0))  # none represents zero intial-state
+        # choose r_out at last time step
+        out = self.h2o(out[:, -1, :])
+        return out

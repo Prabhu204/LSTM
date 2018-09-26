@@ -1,3 +1,6 @@
-.idea/
-src/SAMPLE.py
+src/train.py
 Data/
+src/toy_example.py
+src/dataset_process.py
+src/Basic_rnn.py
+model.ckpt
