@@ -99,8 +99,12 @@ def train(opt):
             test_loss = 0
             predictions= []
             target_list= []
-            for text, labels in dev_loader:
-                labels = labels
+            for batch in dev_loader:
+                if opt.gpu:
+                    batch = [Variable(record).cuda() for record in batch]
+                else:
+                    batch = [Variable(record) for record in batch]
+                text, labels = batch
                 outputs = model(text)
                 test_loss += criterion(outputs, labels)  # to sum up batch loss
                 pred = outputs.argmax(1)  # get the index of the max log-probability

@@ -1,0 +1,1 @@
+Selected model parameters: {'dataset': 'Data', 'batch_size': 64, 'max_length': 3000, 'gpu': False, 'import_model': 'trained_model', 'save_result': 'Result', 'file_name': 'used_param_testdata.txt'}
