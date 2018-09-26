@@ -8,7 +8,7 @@ from  torch.autograd import Variable
 import numpy as np
 
 class LSTMChar(nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes, num_layers, vocab = None,embedding_dim = None):
+    def __init__(self, input_size, hidden_size, num_classes, num_layers, vocab ,embedding_dim):
         super(LSTMChar, self).__init__()
         self.input_size= input_size       # input size
         self.hidden_size = hidden_size    # hidden dimension
@@ -16,7 +16,7 @@ class LSTMChar(nn.Module):
         self.num_layers = num_layers
 
 
-        self.encoder = nn.Embedding(vocab, embedding_dim)
+        self.encoder = nn.Embedding( vocab, embedding_dim)
 
         self.lstm = nn.LSTM(input_size,hidden_size, batch_first= True)
 
